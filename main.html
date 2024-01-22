@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: #f4f4f4;
+        }
+        #chat-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+        }
+        #chat-messages {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+        .user-message, .bot-message {
+            margin-bottom: 10px;
+        }
+        .user-message {
+            text-align: right;
+            color: #007bff;
+        }
+        .bot-message {
+            text-align: left;
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+
+<div id="chat-container">
+    <ul id="chat-messages"></ul>
+    <input type="text" id="user-input" placeholder="Type your message...">
+    <button onclick="sendMessage()">Send</button>
+</div>
+
+<script>
+    const chatMessages = document.getElementById('chat-messages');
+    const userInput = document.getElementById('user-input');
+
+    function appendMessage(sender, message) {
+        const li = document.createElement('li');
+        li.className = sender === 'user' ? 'user-message' : 'bot-message';
+        li.textContent = message;
+        chatMessages.appendChild(li);
+    }
+
+    function sendMessage() {
+        const userMessage = userInput.value;
+        if (userMessage.trim() === '') return;
+
+        appendMessage('user', userMessage);
+        userInput.value = '';
+
+        // Replace 'YOUR_API_KEY' with your actual API key
+        const apiKey = 'S6CRCF6XBKQPYMXAV7X4ZP0G9ROTTPY1ZKQVVK7K6RCLPLN3LL0NOBZ6PWXY6EW7';
+        const apiUrl = 'https://jamsapi.hackclub.dev/openai/chat/completions';
+
+        fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+                model: 'gpt-3.5-turbo',
+                messages: [
+                    { role: 'system', content: 'You are a helpful assistant.' },
+                    { role: 'user', content: userMessage }
+                ]
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            const botMessage = data.choices[0].message.content;
+            appendMessage('bot', botMessage);
+        })
+        .catch(error => console.error('Error:', error));
+    }
+</script>
+
+</body>
+</html>
